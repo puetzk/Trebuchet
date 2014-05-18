@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>icons/pause.png</file>
+        <file>icons/play.png</file>
+        <file>icons/next.png</file>
+        <file>icons/previous.png</file>
+        <file>ImageButton.qml</file>
+        <file>icons/marker.png</file>
+        <file>VideoMarker.qml</file>
+        <file>VideoSeek.qml</file>
+        <file>Measure.qml</file>
+    </qresource>
+</RCC>
