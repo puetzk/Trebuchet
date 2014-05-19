@@ -10,5 +10,6 @@
         <file>VideoMarker.qml</file>
         <file>VideoSeek.qml</file>
         <file>Measure.qml</file>
+        <file>icons/Trebuchet.png</file>
     </qresource>
 </RCC>

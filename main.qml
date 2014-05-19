@@ -9,8 +9,8 @@ import HudsonPiratePride.Trebuchet 1.0
 
 Window {
     visible: true
-    width: 360
-    height: 360
+    width: 640
+    height: 480
 
     //MouseArea {
     //    anchors.fill: parent
@@ -25,6 +25,12 @@ Window {
         anchors.right: column.left
         anchors.bottom: parent.bottom
 
+        DropArea {
+            anchors.fill: video
+            onDropped: {
+                video.source = drop.urls[0];
+            }
+        }
 
         VideoSeek {
             id: video
@@ -44,15 +50,10 @@ Window {
                }
             }
 
-            source: "c:/Users/puetzk/Desktop/MVI_0190.MOV"
+            //source: "c:/Users/puetzk/Desktop/MVI_0190.MOV"
             muted: true
 
-            DropArea {
-                anchors.fill: video
-                onDropped: {
-                    video.source = drop.urls[0];
-                }
-            }
+            visible: source != ""
 
             MouseArea {
                 anchors.fill: parent
@@ -63,6 +64,31 @@ Window {
                 }
             }
         }
+
+        Rectangle {
+            anchors.fill: video
+            visible: video.source == ""
+            Image {
+                anchors.top: parent.top
+                anchors.bottom: dragPrompt.top
+                anchors.left: parent.left
+                anchors.right: parent.right
+                fillMode: Image.PreserveAspectFit
+                source: "icons/Trebuchet.png"
+            }
+
+            Text {
+                id: dragPrompt
+
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+
+                text: "Drag in movie file to begin"
+                horizontalAlignment: Text.AlignHCenter
+                font.pointSize: 20
+            }
+         }
 
         Measure {
             id: measure
@@ -75,6 +101,8 @@ Window {
             sourceRect: video.sourceRect
 
             angleVisible: angleWanted.checked
+
+            visible: video.visible
 
             VideoMarker {
                 id: vertexMarker
@@ -106,6 +134,8 @@ Window {
             sourceRect: video.sourceRect
 
             angleVisible: false
+
+            visible: video.visible
 
             VideoMarker {
                 id: calibrateA
