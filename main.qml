@@ -33,6 +33,9 @@ Window {
         anchors.right: parent.right
         anchors.bottom: column.top
 
+        framerate: 240
+        playbackRate: 0.125
+
         autoPlay: false
 
         onError: {
@@ -46,9 +49,12 @@ Window {
 
         MouseArea {
             anchors.fill: parent
-            onClicked: video.play()
+            //onClicked: video.play()
+            onWheel: {
+                if(wheel.angleDelta.y > 0) video.nextFrame()
+                if(wheel.angleDelta.y < 0) video.prevFrame()
+            }
         }
-
     }
 
     Measure {
@@ -58,29 +64,29 @@ Window {
         base: baseMarker.spacePosition
         measure: measureMarker.spacePosition
 
+        contentRect: video.contentRect
+        sourceRect: video.sourceRect
+
         angleVisible: angleWanted.checked
     }
 
     VideoMarker {
         id: vertexMarker
         video: video
-        x: 100
-        y: 100
+        spacePosition: Qt.point(100,100)
     }
 
     VideoMarker {
         id: baseMarker
         video: video
-        x: 150
-        y: 100
+        spacePosition: Qt.point(150,100)
         visible: angleWanted.checked
     }
 
     VideoMarker {
         id: measureMarker
         video: video
-        x: 150
-        y: 50
+        spacePosition: Qt.point(150,50)
     }
 
     Column {
@@ -142,18 +148,32 @@ Window {
             }
 
             Text{
-                text: (measure.angle * 180 / Math.PI).toFixed(1)
+                id: angleMeasure
+                property double value: (measure.angle * 180 / Math.PI)
+                property string units: "deg"
+                text: (measure.angle * 180 / Math.PI).toFixed(1) + " " + units
                 visible: angleWanted.checked
+            }
+
+            Text {
+                text: " (" + (angleMeasure.value / ((measureMarker.timePosition - baseMarker.timePosition)/1000)).toFixed(1) + "/s)"
+                visible: angleWanted.checked && (measureMarker.timePosition != baseMarker.timePosition)
             }
         }
 
 
-        Text {
-            text: "Length: " + measure.length.toFixed(1)
-        }
+        Row {
+            Text {
+                id: lengthMeasure
+                property double value: measure.length
+                property string units: "px"
+                text: "Length: " + value.toFixed(1) + " " + units
+            }
 
-        Text {
-            text: "Speed: " + measure.length.toFixed(1) / (measureMarker.timePosition - baseMarker.timePosition)
+            Text {
+                text: " (" + (lengthMeasure.value / ((measureMarker.timePosition - vertexMarker.timePosition)/1000)).toFixed(1) + "/s)"
+                visible: measureMarker.timePosition != vertexMarker.timePosition
+            }
         }
     }
 

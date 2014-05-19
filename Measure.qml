@@ -14,14 +14,15 @@ Canvas {
     property double arrowHeadSize: 10
     property bool angleVisible: true
 
-    //canvasSize: Qt.size(width,height)
-    //canvasWindow: Qt.rect(0,0,width, height)
+    // transformation rects if
+    property rect sourceRect : Qt.rect(0,0, 1,1)
+    property rect contentRect : Qt.rect(0,0, 1,1)
 
+    function mapFromContent(point) {
+        return Qt.point((point.x - sourceRect.x) * (contentRect.width/sourceRect.width) + contentRect.x,
+                        (point.y - sourceRect.y) * (contentRect.height/sourceRect.height) + contentRect.y)
 
-    width: 1000
-    height: 1000
-
-
+    }
     function angleFrom(a,b) {
         function crossProduct(a,b) {
             return a.x*b.y - b.x *a.y
@@ -45,6 +46,8 @@ Canvas {
     onAngleVisibleChanged: requestPaint()
     onWidthChanged: requestPaint()
     onHeightChanged: requestPaint()
+    onContentRectChanged: requestPaint()
+    onSourceRectChanged: requestPaint()
 
     onPaint: {
         function arrowHead(x, y, size, angle) {
@@ -56,8 +59,8 @@ Canvas {
             ctx.lineTo(-size, size/2)
             ctx.lineTo(-size, -size/2)
             ctx.closePath()
-            ctx.restore()
             ctx.fill()
+            ctx.restore()
         }
 
         var ctx = canvas.getContext('2d')
@@ -70,40 +73,43 @@ Canvas {
         ctx.lineWidth = 3;
         ctx.lineJoin = "round"
 
+        var itemVertex = mapFromContent(vertex)
+        var itemMeasure = mapFromContent(measure)
+        var itemBase = mapFromContent(base)
+
         // draw lines
         ctx.beginPath()
-        ctx.moveTo(measure.x, measure.y)
-        ctx.lineTo(vertex.x, vertex.y)
+        ctx.moveTo(itemMeasure.x, itemMeasure.y)
+        ctx.lineTo(itemVertex.x, itemVertex.y)
         if(angleVisible) {
-            ctx.lineTo(base.x, base.y)
+            ctx.lineTo(itemBase.x, itemBase.y)
         }
         ctx.stroke()
 
         var measureAngle = angleFrom(originVector,measureVector)
 
         if(arrowHeadSize > 0) {
-            arrowHead(measure.x, measure.y, arrowHeadSize, measureAngle)
+            arrowHead(itemMeasure.x, itemMeasure.y, arrowHeadSize, measureAngle)
         }
-
 
         if(angleVisible) {
             // draw arc
 
             ctx.beginPath()
-            ctx.moveTo(vertex.x, vertex.y)
+            var radius = Math.min(angleRadius,measureVector.length(), baseVector.length())
+            var head = measureVector.times(radius / measureVector.length())
+            ctx.moveTo(itemVertex.x + head.x, itemVertex.y + head.y)
             var baseAngle = angleFrom(originVector, baseVector)
 
-            var radius = Math.min(angleRadius,measureVector.length(), baseVector.length())
-            ctx.arc(vertex.x, vertex.y, radius, measureAngle, baseAngle)
+            ctx.arc(itemVertex.x, itemVertex.y, radius, measureAngle, baseAngle)
             ctx.stroke()
 
             // draw arrowHead
-            if(arrowHeadSize > 0) {
-                var head = measureVector.times(radius / measureVector.length())
+            //if(arrowHeadSize > 0) {
                 // change the angle of the arrowhead by its fraction of the circumference, so it looks balanced
                 var angleTweak = arrowHeadSize / (2*Math.PI*radius)
-                arrowHead(vertex.x + head.x, vertex.y + head.y, arrowHeadSize, measureAngle - Math.PI/2 + Math.PI*angleTweak)
-            }
+                arrowHead(itemVertex.x + head.x, itemVertex.y + head.y, arrowHeadSize, measureAngle - Math.PI/2 + Math.PI*angleTweak)
+            //}
         }
 
         ctx.restore()

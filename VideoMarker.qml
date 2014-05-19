@@ -15,30 +15,38 @@ Item {
 
     property VideoSeek video
 
-    property point spacePosition: Qt.point(x,y)
+    property point spacePosition: Qt.point(50,50)
     property double timePosition : -1
+
+    x: video.mapPointFromSource(spacePosition,video.contentRect).x
+    y: video.mapPointFromSource(spacePosition,video.contentRect).y
 
     MouseArea {
         id: draggable
         acceptedButtons: Qt.LeftButton | Qt.RightButton
         anchors.fill: icon
-        drag.target: marker
-        //onPressed: Drag.startDrag()
-        drag.minimumX: video.contentRect.x
-        drag.maximumX: video.contentRect.x + video.contentRect.width
-        drag.minimumY: video.contentRect.y
-        drag.maximumY: video.contentRect.y + video.contentRect.height
-        drag.threshold: 2
+
+        property bool dragging: false
 
         onReleased: {
             if(mouse.button == Qt.LeftButton) {
                 marker.timePosition = video.startPosition
             }
+            dragging = false
         }
 
         onPressed: {
+            dragging = true
             if(mouse.button == Qt.RightButton) {
                 marker.video.seekFrame(marker.timePosition)
+            }
+        }
+
+        onPositionChanged: {
+            if(dragging) {
+                var mousePoint = mapToItem(null, mouse.x, mouse.y)
+                var mappedPos = video.mapPointToSource(Qt.point(mousePoint.x, mousePoint.y))
+                marker.spacePosition = Qt.point(mappedPos.x, mappedPos.y)
             }
         }
     }

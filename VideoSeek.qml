@@ -15,29 +15,29 @@ Rectangle {
     }
 
     function prevFrame() {
-        /*
-        //console.debug("current frame runs from " + videoTimer.startTime + " to " + videoTimer.endTime + " ms")
-        //videoPlaceholder.visible = true
-        placeholder.visible = true
-        timer.pauseAt = timer.startTime - 1
-        // need to seek by enough that we reliably find a keyframe. 300 seems adequate
-        player.seek(videoTimer.startTime - 300)
-        player.play()
-        */
         seekFrame(startPosition - 1)
     }
 
     function seekFrame(desiredPosition)
     {
+        var rawDesiredPosition = desiredPosition * framerate/30
         //console.debug("seeking from " + position + " to " + desiredPosition)
         seeking = true
         player.play()
-        player.seek(desiredPosition - 300)
-        timer.pauseAt = desiredPosition
+        player.seek(rawDesiredPosition - 300)
+        timer.pauseAt = rawDesiredPosition
     }
 
     function seek(desiredPosition) {
-        player.seek(desiredPosition)
+        player.seek(desiredPosition * framerate/30)
+    }
+
+    function mapPointToSource(pos) {
+        return videoOut.mapPointToSource(pos)
+    }
+
+    function mapPointFromSource(pos) {
+        return videoOut.mapPointToItem(pos)
     }
 
     signal paused
@@ -47,12 +47,13 @@ Rectangle {
 
     property alias fillMode:        videoOut.fillMode
     property alias orientation:     videoOut.orientation
+
     property alias contentRect:     videoOut.contentRect
+    property alias sourceRect:      videoOut.sourceRect
 
     property alias playbackState:   player.playbackState
     property alias autoLoad:        player.autoLoad
     property alias bufferProgress:  player.bufferProgress
-    property alias duration:        player.duration
     property alias error:           player.error
     property alias errorString:     player.errorString
     property alias availability:    player.availability
@@ -60,18 +61,25 @@ Rectangle {
     property alias hasVideo:        player.hasVideo
     property alias metaData:        player.metaData
     property alias muted:           player.muted
-    property alias playbackRate:    player.playbackRate
     property alias seekable:        player.seekable
     property alias source:          player.source
     property alias status:          player.status
     property alias volume:          player.volume
-    property bool autoPlay:   false
+
+    // not aliased, use our fancy pause-on-frame stuff to autoPause rather than not starting at all
+    property bool autoPlay:         false
+
+    // not directly aliasing these, because we want to properly scale the timebase of high-speed (non-30fps) video
+    //property alias playbackRate:    player.playbackRate
+    readonly property double duration: player.duration * 30/framerate
+    property double playbackRate: 1 * 30/framerate
+    property int framerate: 30
 
     // coarse position (provided by player)
-    property alias position:        player.position
+    readonly property double position:        player.position * 30/framerate
     // fine position (provided by VideoProbe)
-    property alias startPosition:   timer.startTime
-    property alias endPosition:     timer.endTime
+    readonly property double startPosition:   timer.startTime * 30/framerate
+    readonly property double endPosition:     timer.endTime * 30/framerate
 
     property bool seeking: false
 
@@ -87,6 +95,8 @@ Rectangle {
             id: player
 
             onError: video.error(error,errorString)
+
+            playbackRate: video.playbackRate * (video.framerate/30)
 
             autoPlay: true
             onStatusChanged: {
