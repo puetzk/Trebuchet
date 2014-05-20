@@ -50,8 +50,8 @@ copy %QTDIR%\bin\icuuc52.dll %OUTPUT%
 copy %QTDIR%\bin\icudt52.dll %OUTPUT%
 
 REM CRT
-copy "%VS120COMNTOOLS%..\..\VC\redist\x86\Microsoft.VC120.CRT\msvcr120.dll" %~dp0
-copy "%VS120COMNTOOLS%..\..\VC\redist\x86\Microsoft.VC120.CRT\msvcp120.dll" %~dp0
+copy "%VS120COMNTOOLS%..\..\VC\redist\x86\Microsoft.VC120.CRT\msvcr120.dll" %OUTPUT%
+copy "%VS120COMNTOOLS%..\..\VC\redist\x86\Microsoft.VC120.CRT\msvcp120.dll" %OUTPUT%
 
 goto :eof
 
