@@ -354,7 +354,7 @@ Window {
                 anchors.top: parent.top
                 anchors.left: parent.right
                 width: column.width - parent.width
-                text: "Left-click:\nset marker's time"
+                text: "Left-click:\nchange marker's frame"
             }
         }
 
@@ -368,7 +368,7 @@ Window {
                 anchors.top: parent.top
                 anchors.left: parent.right
                 width: column.width - parent.width
-                text: "Right-click:\nrewind to marker's time"
+                text: "Right-click:\nsee marker's frame"
             }
         }
 
