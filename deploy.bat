@@ -1,9 +1,10 @@
 @echo off
-rmdir /q /s %~dp0deploy
-mkdir %~dp0deploy
+
 SET QTDIR=C:\Qt\5.3\msvc2013
 SET OUTPUT=%~dp0deploy\
 
+if exist "%OUTPUT%" rmdir /q /s "%OUTPUT%"
+mkdir "%OUTPUT%"
 
 copy %~dp0Trebuchet.exe %OUTPUT%
 
@@ -16,7 +17,6 @@ copy %QTDIR%\bin\Qt5MultimediaQuick_p.dll %OUTPUT%
 copy %QTDIR%\bin\Qt5Network.dll %OUTPUT%
 copy %QTDIR%\bin\Qt5Svg.dll %OUTPUT%
 
-mkdir %~dp0\QtQuick.2
 call :copydir %QTDIR%\qml QtQuick.2 plugins.qmltypes qmldir qtquick2plugin.dll
 
 call :copydir %QTDIR%\plugins platforms qwindows.dll
