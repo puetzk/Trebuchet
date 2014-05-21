@@ -11,5 +11,7 @@
         <file>VideoSeek.qml</file>
         <file>Measure.qml</file>
         <file>icons/Trebuchet.png</file>
+        <file>icons/left-click.png</file>
+        <file>icons/right-click.png</file>
     </qresource>
 </RCC>

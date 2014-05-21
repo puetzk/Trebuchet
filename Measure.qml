@@ -14,6 +14,8 @@ Canvas {
     property double arrowHeadSize: 10
     property bool angleVisible: true
 
+    property color color: Qt.rgba(1,1,1,.7)
+
     // transformation rects if
     property rect sourceRect : Qt.rect(0,0, 1,1)
     property rect contentRect : Qt.rect(0,0, 1,1)
@@ -38,6 +40,7 @@ Canvas {
     // gives -180-180
     property double length: measureVector.length()
 
+    onColorChanged: requestPaint()
     onVertexChanged: requestPaint()
     onBaseChanged: requestPaint()
     onMeasureChanged: requestPaint()
@@ -68,8 +71,8 @@ Canvas {
         ctx.reset(); // QTBUG-36761, works around resizing problem
 
         ctx.save()
-        ctx.strokeStyle = Qt.rgba(1,1,1,.7)
-        ctx.fillStyle = Qt.rgba(1,1,1,.7)
+        ctx.strokeStyle = color
+        ctx.fillStyle = color
         ctx.lineWidth = 3;
         ctx.lineJoin = "round"
 
