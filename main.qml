@@ -289,8 +289,39 @@ Window {
 
         }
 
+        Rectangle {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: timeLabel.height + time.height
+            Text {
+                id: timeLabel
+                text: "Time: "
+                font.bold: true
+                font.pointSize: 10
+                color: calibrate.color
+            }
+
+
+            //anchors.right: parent.right
+            Text {
+                id: time
+
+                x: column.hangingIndent
+                anchors.top: timeLabel.bottom
+
+                text: (video.position - zeroTime) + " ms"
+                property double zeroTime: 0
+            }
+            ImageButton {
+                anchors.right: parent.right
+                anchors.bottom: time.bottom
+                iconSource: "icons/stopwatch.png"
+                onClicked: time.zeroTime = video.position
+            }
+        }
+
         Text {
-            text: "Length: "
+            text: "Measure: "
             font.bold: true
             font.pointSize: 10
             color: measure.color

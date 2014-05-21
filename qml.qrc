@@ -13,5 +13,6 @@
         <file>icons/Trebuchet.png</file>
         <file>icons/left-click.png</file>
         <file>icons/right-click.png</file>
+        <file>icons/stopwatch.png</file>
     </qresource>
 </RCC>
