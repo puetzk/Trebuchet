@@ -99,7 +99,7 @@ Window {
             contentRect: video.contentRect
             sourceRect: video.sourceRect
 
-            angleVisible: angleWanted.checked
+            angleDirection: -1
 
             visible: video.visible
 
@@ -109,20 +109,20 @@ Window {
             VideoMarker {
                 id: vertexMarker
                 video: video
-                spacePosition: Qt.point(100,100)
+                spacePosition: Qt.point(150,100)
             }
 
             VideoMarker {
                 id: baseMarker
                 video: video
-                spacePosition: Qt.point(150,100)
-                visible: angleWanted.checked
+                spacePosition: Qt.point(100,100)
+                visible: measure.angleDirection != 0
             }
 
             VideoMarker {
                 id: measureMarker
                 video: video
-                spacePosition: Qt.point(150,50)
+                spacePosition: Qt.point(100,50)
             }
         }
 
@@ -137,8 +137,6 @@ Window {
 
             contentRect: video.contentRect
             sourceRect: video.sourceRect
-
-            angleVisible: false
 
             visible: video.visible
 
@@ -212,7 +210,7 @@ Window {
         width: 150
         spacing: 5
 
-        property double hangingIndent: 17
+        property double hangingIndent: 32
 
         Text {
             text: "Speed: "
@@ -261,6 +259,36 @@ Window {
             }
         }
 
+        Rectangle {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: timeLabel.height + time.height
+            Text {
+                id: timeLabel
+                text: "Time: "
+                font.bold: true
+                font.pointSize: 10
+            }
+
+
+            //anchors.right: parent.right
+            Text {
+                id: time
+
+                x: column.hangingIndent
+                anchors.top: timeLabel.bottom
+
+                text: (video.position - zeroTime) + " ms"
+                property double zeroTime: 0
+            }
+            ImageButton {
+                anchors.right: parent.right
+                anchors.bottom: time.bottom
+                iconSource: "icons/stopwatch.png"
+                onClicked: time.zeroTime = video.position
+            }
+        }
+
         Text {
             text: "Calibrate: "
             font.bold: true
@@ -289,37 +317,6 @@ Window {
 
         }
 
-        Rectangle {
-            anchors.left: parent.left
-            anchors.right: parent.right
-            height: timeLabel.height + time.height
-            Text {
-                id: timeLabel
-                text: "Time: "
-                font.bold: true
-                font.pointSize: 10
-                color: calibrate.color
-            }
-
-
-            //anchors.right: parent.right
-            Text {
-                id: time
-
-                x: column.hangingIndent
-                anchors.top: timeLabel.bottom
-
-                text: (video.position - zeroTime) + " ms"
-                property double zeroTime: 0
-            }
-            ImageButton {
-                anchors.right: parent.right
-                anchors.bottom: time.bottom
-                iconSource: "icons/stopwatch.png"
-                onClicked: time.zeroTime = video.position
-            }
-        }
-
         Text {
             text: "Measure: "
             font.bold: true
@@ -345,8 +342,22 @@ Window {
         }
 
         Row {
-            CheckBox {
-                id: angleWanted
+
+            ImageButton {
+                width: 32
+                iconSource: {
+                    if(measure.angleDirection < 0) return "icons/angle-clockwise.png"
+                    else if(measure.angleDirection > 0) return "icons/angle-counterclockwise.png"
+                    else return "icons/angle-off.png"
+                }
+                onClicked: {
+                    if(measure.angleDirection < 0) measure.angleDirection = 0
+                    else if(measure.angleDirection > 0) measure.angleDirection = -1
+                    else measure.angleDirection = 1
+                }
+            }
+
+            Text {
                 text: "Angle:"
             }
 
@@ -355,12 +366,12 @@ Window {
                 property double value: (measure.angle * 180 / Math.PI)
                 property string units: "deg"
                 text: (measure.angle * 180 / Math.PI).toFixed(1) + " " + units
-                visible: angleWanted.checked
+                visible: measure.angleDirection != 0
             }
 
             Text {
                 text: " (" + (angleMeasure.value / ((measureMarker.timePosition - baseMarker.timePosition)/1000)).toFixed(1) + "/s)"
-                visible: angleWanted.checked && (measureMarker.timePosition != baseMarker.timePosition)
+                visible: measure.angleDirection != 0 && (measureMarker.timePosition != baseMarker.timePosition)
             }
         }
 

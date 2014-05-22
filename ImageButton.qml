@@ -13,7 +13,7 @@ Rectangle {
     //color : mouse.pressed ? "red" : "blue"
 
     Image {
-        anchors.fill: parent
+        anchors.centerIn: parent
         id: icon
     }
 

@@ -12,7 +12,7 @@ Canvas {
 
     property double angleRadius: 50
     property double arrowHeadSize: 10
-    property bool angleVisible: true
+    property int angleDirection: 0 /*1=counterclockwise, 0=off, -1=clockwise */
 
     property color color: Qt.rgba(1,1,1,.7)
 
@@ -36,7 +36,7 @@ Canvas {
 
     // gives 0-180, switches sides
     //property double angle : Math.acos(measureVector.normalized().dotProduct(baseVector.normalized()))
-    property double angle: angleFrom(measureVector, baseVector)
+    property double angle: angleDirection < 0 ? angleFrom(baseVector, measureVector) : angleFrom(measureVector,baseVector)
     // gives -180-180
     property double length: measureVector.length()
 
@@ -46,7 +46,7 @@ Canvas {
     onMeasureChanged: requestPaint()
     onAngleRadiusChanged: requestPaint()
     onArrowHeadSizeChanged: requestPaint()
-    onAngleVisibleChanged: requestPaint()
+    onAngleDirectionChanged: requestPaint()
     onWidthChanged: requestPaint()
     onHeightChanged: requestPaint()
     onContentRectChanged: requestPaint()
@@ -84,7 +84,7 @@ Canvas {
         ctx.beginPath()
         ctx.moveTo(itemMeasure.x, itemMeasure.y)
         ctx.lineTo(itemVertex.x, itemVertex.y)
-        if(angleVisible) {
+        if(angleDirection != 0) {
             ctx.lineTo(itemBase.x, itemBase.y)
         }
         ctx.stroke()
@@ -95,7 +95,7 @@ Canvas {
             arrowHead(itemMeasure.x, itemMeasure.y, arrowHeadSize, measureAngle)
         }
 
-        if(angleVisible) {
+        if(angleDirection != 0) {
             // draw arc
 
             ctx.beginPath()
@@ -104,14 +104,14 @@ Canvas {
             ctx.moveTo(itemVertex.x + head.x, itemVertex.y + head.y)
             var baseAngle = angleFrom(originVector, baseVector)
 
-            ctx.arc(itemVertex.x, itemVertex.y, radius, measureAngle, baseAngle)
+            ctx.arc(itemVertex.x, itemVertex.y, radius, measureAngle, baseAngle, angleDirection < 0)
             ctx.stroke()
 
             // draw arrowHead
             //if(arrowHeadSize > 0) {
                 // change the angle of the arrowhead by its fraction of the circumference, so it looks balanced
                 var angleTweak = arrowHeadSize / (2*Math.PI*radius)
-                arrowHead(itemVertex.x + head.x, itemVertex.y + head.y, arrowHeadSize, measureAngle - Math.PI/2 + Math.PI*angleTweak)
+                arrowHead(itemVertex.x + head.x, itemVertex.y + head.y, arrowHeadSize, measureAngle - angleDirection * Math.PI * (.5-angleTweak))
             //}
         }
 

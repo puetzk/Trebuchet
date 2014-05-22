@@ -14,5 +14,8 @@
         <file>icons/left-click.png</file>
         <file>icons/right-click.png</file>
         <file>icons/stopwatch.png</file>
+        <file>icons/angle-clockwise.png</file>
+        <file>icons/angle-counterclockwise.png</file>
+        <file>icons/angle-off.png</file>
     </qresource>
 </RCC>
